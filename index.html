@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bacolod City National High School</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 400px;
+            text-align: left;
+            z-index: 1000;
+        }
+        .popup .comment {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 10px;
+        }
+        .popup .comment strong {
+            color: #ffcc00;
+        }
+        .popup .close-btn {
+            background: red;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            cursor: pointer;
+            float: right;
+        }
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+    </style>
+</head>
+<body>
+    <header class="hero">
+        <nav class="navbar">
+            <div class="menu">MENU</div>
+            <div class="logo"> 
+                <img src="img/logo2.png" alt="School Logo" style="width: 20vw;">
+            </div>
+            <div class="tour">Links</div>
+        </nav>
+        <div class="hero-content">
+            <div class="text-container">
+                <h2>BACOLOD CITY NATIONAL HIGH SCHOOL</h2>
+                <h1>Mentoring Bacolod's Youth</h1>
+            </div>
+            <br>
+            <button class="btn" id="commentsBtn">Comments</button>
+        </div>
+    </header>
+    <section class="info">
+        <div class="info-item">
+            <h3>MIND</h3>
+            <p>A strong academic foundation for independent thinking and innovation.</p>
+        </div>
+        <div class="info-item">
+            <h3>BODY</h3>
+            <p>Athletic opportunities to develop physical skills and teamwork.</p>
+        </div>
+        <div class="info-item">
+            <h3>SPIRIT</h3>
+            <p>Connecting students to a higher mission and purpose-driven life.</p>
+        </div>
+        <div class="info-item">
+            <h3>CHARACTER</h3>
+            <p>Building integrity and holding each other to the highest standards.</p>
+        </div>
+    </section>
+    <!-- Popup Container -->
+    <div class="overlay" id="overlay"></div>
+    <div class="popup" id="popup">
+        <button class="close-btn" onclick="closePopup()">X</button>
+        <h3>Comments</h3>
+        <div id="commentsList">Loading...</div>
+    </div>
+
+    <script>
+        // Google Sheets CSV Link
+        const sheetUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vQMJJ6GHiB4-2d7cgs3CayudU_jZST8kvCO5WY9Vyz3bQkQ-sj0gfhtQGIuQMFIIaGq0zNJmicYWPHD/pub?gid=478467120&single=true&output=csv";
+
+        // Open Popup and Load Comments
+        document.getElementById("commentsBtn").addEventListener("click", async function() {
+            document.getElementById("popup").style.display = "block";
+            document.getElementById("overlay").style.display = "block";
+            await fetchComments();
+        });
+
+        // Close Popup
+        function closePopup() {
+            document.getElementById("popup").style.display = "none";
+            document.getElementById("overlay").style.display = "none";
+        }
+
+        // Fetch Google Sheets Data
+        async function fetchComments() {
+            try {
+                const response = await fetch(sheetUrl);
+                const data = await response.text();
+                const rows = data.split("\n").slice(1); // Remove header row
+
+                let commentsHTML = "";
+                rows.forEach(row => {
+                    let columns = row.split(",");
+                    let date = columns[0];
+                    let name = columns[1];
+                    let comment = columns[5];
+
+                    commentsHTML += `
+                        <div class="comment">
+                            <strong>${name}</strong> (${date}):<br>
+                            ${comment}
+                        </div>
+                    `;
+                });
+
+                document.getElementById("commentsList").innerHTML = commentsHTML || "No comments yet.";
+            } catch (error) {
+                console.error("Error fetching data:", error);
+                document.getElementById("commentsList").innerHTML = "Failed to load comments.";
+            }
+        }
+    </script>
+</body>
+</html>
