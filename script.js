@@ -9,3 +9,18 @@ if ("serviceWorker" in navigator) {
             });
     });
 }
+
+let installPrompt;
+
+window.addEventListener("beforeinstallprompt", (event) => {
+    event.preventDefault();
+    installPrompt = event;
+    document.getElementById("install-button").style.display = "block";
+});
+
+document.getElementById("install-button").addEventListener("click", () => {
+    if (installPrompt) {
+        installPrompt.prompt();
+    }
+});
+
